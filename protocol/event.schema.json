@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:scholarstate:protocol:0.1:event",
+  "title": "ScholarState event",
+  "type": "object",
+  "required": ["protocol", "type", "createdAt", "actor", "humanAnchors", "payload", "eventId"],
+  "additionalProperties": true,
+  "properties": {
+    "protocol": { "const": "scholarstate/0.1" },
+    "type": {
+      "enum": ["object.publish", "relation.assert", "activity.record", "attestation.issue", "profile.publish"]
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "actor": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["human", "ai", "organization", "software"] },
+        "name": { "type": "string" }
+      }
+    },
+    "humanAnchors": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "payload": { "type": "object" },
+    "proof": { "type": "object" },
+    "eventId": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "object.publish" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/objectPublish" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "relation.assert" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/relationAssert" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "activity.record" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/activityRecord" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "attestation.issue" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/attestationIssue" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "profile.publish" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/profilePublish" } } }
+    }
+  ],
+  "$defs": {
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "artifact": {
+      "type": "object",
+      "required": ["mediaType", "url", "role"],
+      "properties": {
+        "mediaType": { "$ref": "#/$defs/nonEmpty" },
+        "url": { "$ref": "#/$defs/nonEmpty" },
+        "role": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "objectPublish": {
+      "type": "object",
+      "required": ["objectId", "objectType", "versionId", "title", "artifacts"],
+      "properties": {
+        "objectId": { "$ref": "#/$defs/nonEmpty" },
+        "objectType": { "$ref": "#/$defs/nonEmpty" },
+        "versionId": { "$ref": "#/$defs/nonEmpty" },
+        "title": { "$ref": "#/$defs/nonEmpty" },
+        "replaces": { "$ref": "#/$defs/nonEmpty" },
+        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/artifact" } }
+      }
+    },
+    "relationAssert": {
+      "type": "object",
+      "required": ["relationId", "relationType", "subject", "object", "basis"],
+      "properties": {
+        "relationId": { "$ref": "#/$defs/nonEmpty" },
+        "relationType": { "$ref": "#/$defs/nonEmpty" },
+        "subject": { "$ref": "#/$defs/nonEmpty" },
+        "object": { "$ref": "#/$defs/nonEmpty" },
+        "basis": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "activityRecord": {
+      "type": "object",
+      "required": ["activityId", "activityType", "inputs", "outputs", "environment"],
+      "properties": {
+        "activityId": { "$ref": "#/$defs/nonEmpty" },
+        "activityType": { "$ref": "#/$defs/nonEmpty" },
+        "inputs": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "outputs": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "environment": { "type": "object" }
+      }
+    },
+    "attestationIssue": {
+      "type": "object",
+      "required": ["attestationId", "attestationType", "subject", "position", "statement", "evidence", "authority"],
+      "properties": {
+        "attestationId": { "$ref": "#/$defs/nonEmpty" },
+        "attestationType": { "$ref": "#/$defs/nonEmpty" },
+        "subject": { "$ref": "#/$defs/nonEmpty" },
+        "position": { "$ref": "#/$defs/nonEmpty" },
+        "statement": { "$ref": "#/$defs/nonEmpty" },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/nonEmpty" } },
+        "authority": {
+          "type": "object",
+          "required": ["decisive"],
+          "properties": { "decisive": { "type": "boolean" } }
+        }
+      }
+    },
+    "profilePublish": {
+      "type": "object",
+      "required": ["profileId", "version", "title"],
+      "properties": {
+        "profileId": { "$ref": "#/$defs/nonEmpty" },
+        "version": { "$ref": "#/$defs/nonEmpty" },
+        "title": { "$ref": "#/$defs/nonEmpty" }
+      }
+    }
+  }
+}

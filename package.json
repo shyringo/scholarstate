@@ -1,0 +1,18 @@
+{
+  "name": "scholarstate",
+  "version": "0.1.0",
+  "description": "A local-first protocol and reference implementation for auditable research state.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "demo": "node src/cli.js demo",
+    "serve": "node src/server.js",
+    "test": "node --test",
+    "check": "node src/cli.js verify examples/flashattention/events.jsonl && node --test",
+    "example:build": "node scripts/build-example.js"
+  },
+  "license": "Apache-2.0"
+}

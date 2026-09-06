@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inspect a versioned, auditable research record instead of another document feed.">
+    <title>ScholarState - Auditable research state</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="ScholarState home">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>ScholarState</span>
+      </a>
+      <div class="record-title">
+        <span class="eyebrow">Local research record</span>
+        <strong>FlashAttention evidence map</strong>
+      </div>
+      <div class="integrity" id="integrity"><span class="signal"></span> Checking record</div>
+    </header>
+
+    <div class="workspace">
+      <aside class="rail" aria-label="Primary navigation">
+        <nav>
+          <button class="nav-item active" data-view="map"><span aria-hidden="true">&#9678;</span> Evidence map</button>
+          <button class="nav-item" data-view="objects"><span aria-hidden="true">&#8801;</span> Objects</button>
+          <button class="nav-item" data-view="log"><span aria-hidden="true">&#8627;</span> Event log</button>
+        </nav>
+        <div class="rail-note">
+          <span class="eyebrow">Protocol</span>
+          <strong>scholarstate/0.1</strong>
+          <span>Local-first &middot; append-only</span>
+        </div>
+      </aside>
+
+      <main>
+        <section class="summary-band">
+          <div>
+            <span class="eyebrow">Current projection</span>
+            <h1>What does the evidence support now?</h1>
+            <p>A computed view over immutable research events. It is a map of accountable statements, not a platform-issued truth score.</p>
+          </div>
+          <button class="primary" id="new-attestation">Record attestation</button>
+        </section>
+
+        <section class="metrics" aria-label="Record summary">
+          <div><span id="metric-events">0</span><small>immutable events</small></div>
+          <div><span id="metric-objects">0</span><small>research objects</small></div>
+          <div><span id="metric-links">0</span><small>typed relations</small></div>
+          <div><span id="metric-decisions">0</span><small>formal decisions</small></div>
+        </section>
+
+        <section class="view active" id="view-map">
+          <div class="toolbar">
+            <div class="search-wrap">
+              <label for="search">Search record</label>
+              <input id="search" type="search" placeholder="Claim, method, evidence...">
+            </div>
+            <div class="segmented" aria-label="Object type filter">
+              <button class="active" data-filter="all">All</button>
+              <button data-filter="ai:claim">Claims</button>
+              <button data-filter="ai:evidence">Evidence</button>
+              <button data-filter="ai:method">Methods</button>
+            </div>
+          </div>
+          <div class="map-layout">
+            <div class="graph-panel">
+              <div class="panel-heading">
+                <div><span class="eyebrow">Derived view</span><h2>Research state graph</h2></div>
+                <span class="view-note">Select an object to inspect its record</span>
+              </div>
+              <div id="graph" class="graph" role="img" aria-label="Research objects and their typed relationships"></div>
+            </div>
+            <aside class="detail-panel" id="detail" aria-live="polite"></aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-objects">
+          <div class="section-heading"><div><span class="eyebrow">Inventory</span><h2>Research objects</h2></div></div>
+          <div class="object-table-wrap">
+            <table>
+              <thead><tr><th>Object</th><th>Type</th><th>Version</th><th>State</th><th>Links</th></tr></thead>
+              <tbody id="object-table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="view-log">
+          <div class="section-heading">
+            <div><span class="eyebrow">Source of truth</span><h2>Immutable event log</h2></div>
+            <span class="view-note">Every view above can be rebuilt from these records</span>
+          </div>
+          <ol class="event-log" id="event-log"></ol>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="attestation-dialog">
+      <form method="dialog" id="attestation-form">
+        <div class="dialog-heading">
+          <div><span class="eyebrow">Append a research event</span><h2>Record attestation</h2></div>
+          <button type="button" class="icon-button" id="close-dialog" aria-label="Close" title="Close">&times;</button>
+        </div>
+        <p class="form-note">This records who stated what, about which versioned object, and with what authority. It does not silently change prior events.</p>
+        <label>Subject<select name="subject" id="attestation-subject" required></select></label>
+        <div class="form-row">
+          <label>Attestation type<select name="type"><option value="review">Review</option><option value="replication">Replication</option><option value="contradiction">Contradiction</option><option value="source-report">Source report</option><option value="retraction">Retraction</option></select></label>
+          <label>Position<select name="position"><option value="supports">Supports</option><option value="opposes">Opposes</option><option value="reports">Reports</option><option value="decides">Decides</option></select></label>
+        </div>
+        <label>Statement<textarea name="statement" rows="4" required placeholder="State the bounded conclusion and its basis."></textarea></label>
+        <div class="form-row">
+          <label>Your stable identifier<input name="actorId" required placeholder="https://orcid.org/... or institutional URI"></label>
+          <label>Display name<input name="actorName" required></label>
+        </div>
+        <label class="checkbox"><input type="checkbox" name="decisive" id="decisive"> This is a formal decision within a named jurisdiction</label>
+        <div id="authority-fields" hidden>
+          <div class="form-row">
+            <label>Jurisdiction<input name="jurisdiction" placeholder="community or institution URI"></label>
+            <label>Policy version<input name="policy" placeholder="policy URI and version"></label>
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <span id="form-status" role="status"></span>
+          <button type="button" class="secondary" id="cancel-dialog">Cancel</button>
+          <button type="submit" class="primary">Append event</button>
+        </div>
+      </form>
+    </dialog>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
