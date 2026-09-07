@@ -3,12 +3,16 @@ import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { project } from "./core/project.js";
+import { focusProjection } from "./core/granularity.js";
 import { appendEvent, readEvents } from "./core/store.js";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const publicDir = join(root, "web");
 const exampleStore = join(root, "examples", "flashattention", "events.jsonl");
-const workspaceStore = join(root, ".scholarstate", "events.jsonl");
+const storeArg = process.argv.indexOf("--store");
+const workspaceStore = storeArg >= 0
+  ? resolve(root, process.argv[storeArg + 1])
+  : join(root, ".scholarstate", "events-protocol-02.jsonl");
 const portArg = process.argv.indexOf("--port");
 const port = portArg >= 0 ? Number(process.argv[portArg + 1]) : 4317;
 
@@ -19,6 +23,15 @@ const server = createServer(async (request, response) => {
     const url = new URL(request.url, `http://${request.headers.host}`);
     if (url.pathname === "/api/state" && request.method === "GET") {
       return json(response, 200, project(await readEvents(workspaceStore)));
+    }
+    if (url.pathname === "/api/focus" && request.method === "GET") {
+      const state = project(await readEvents(workspaceStore));
+      const roots = url.searchParams.getAll("root");
+      return json(response, 200, focusProjection(state, {
+        roots,
+        depth: url.searchParams.get("depth") ?? 1,
+        limit: url.searchParams.get("limit") ?? 200,
+      }));
     }
     if (url.pathname === "/api/events" && request.method === "GET") {
       return json(response, 200, await readEvents(workspaceStore));

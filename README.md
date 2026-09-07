@@ -36,6 +36,8 @@ source materials -> immutable events -> deterministic projections
 
 The small kernel does not decide what counts as evidence in physics, history, mathematics, or AI. Versioned community profiles define those vocabularies and rules. Raw records remain available when profiles change.
 
+It also does not atomize every paper in advance. Sources enter whole, machine-extracted candidates remain disposable, and a fragment receives a permanent identity only when it is independently cited, tested, disputed, reused, or governed. This keeps durable growth tied to actual scientific activity instead of every claim AI could possibly extract.
+
 ## Guarantees And Boundaries
 
 - Events are content-addressed and append-only; changing any recorded field invalidates its identifier.
@@ -46,6 +48,7 @@ The small kernel does not decide what counts as evidence in physics, history, ma
 - The current prototype verifies structural integrity, not real-world identity or cryptographic signatures. `human-anchored` means a human identifier is present, not that the identity has been authenticated.
 - The generic status projection is a navigation aid. Communities must define profile-specific status semantics before using it institutionally.
 - The JSONL store is designed for a single local writer in this prototype. Concurrent writers need transactional storage or an append coordinator before production use.
+- Global graph rendering is not a scalability strategy. Consumers should use bounded focus projections and disclose truncation.
 
 ## Protocol Kernel
 
@@ -57,7 +60,9 @@ The small kernel does not decide what counts as evidence in physics, history, ma
 | `attestation.issue` | A subject's bounded statement, stance, evidence, responsibility, and authority scope |
 | `profile.publish` | A versioned community vocabulary and policy that can be discussed or forked |
 
-See [protocol specification](docs/protocol.md), [constitutional design](docs/constitutional-design.md), [human authority model](docs/authority.md), and the machine-readable [event schema](protocol/event.schema.json).
+See [protocol specification](docs/protocol.md), [granularity and scale](docs/granularity.md), [constitutional design](docs/constitutional-design.md), [human authority model](docs/authority.md), and the machine-readable [event schema](protocol/event.schema.json).
+
+Protocol changes preserve old local stores instead of rewriting them; see [migration notes](docs/migrations.md).
 
 ## Commands
 
@@ -68,7 +73,7 @@ node src/cli.js project examples/flashattention/events.jsonl
 npm test
 ```
 
-`npm run serve -- --port 4318` selects another local port. The server exposes `GET /api/state`, `GET /api/events`, and `POST /api/events` for local tools and agents.
+`npm run serve -- --port 4318` selects another local port. `--store path/to/events.jsonl` selects an explicit record without rewriting it during startup. The server exposes `GET /api/state`, `GET /api/events`, `POST /api/events`, and a bounded focus query such as `GET /api/focus?root=claim:flashattention-io-aware-exact&depth=1&limit=50`.
 
 ## Why Another Protocol
 

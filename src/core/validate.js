@@ -1,4 +1,5 @@
 import { verifyEventId } from "./canonical.js";
+import { recognizedMaterializationTriggers } from "./granularity.js";
 
 export const EVENT_TYPES = new Set([
   "object.publish",
@@ -19,7 +20,7 @@ export function validateEvent(event, { checkHash = true } = {}) {
   if (!event || typeof event !== "object" || Array.isArray(event)) {
     return ["event must be an object"];
   }
-  if (event.protocol !== "scholarstate/0.1") errors.push("unsupported protocol");
+  if (event.protocol !== "scholarstate/0.2") errors.push("unsupported protocol");
   if (!EVENT_TYPES.has(event.type)) errors.push("unsupported event type");
   if (!present(event.createdAt) || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(event.createdAt) || Number.isNaN(Date.parse(event.createdAt))) {
     errors.push("createdAt must be an ISO-8601 timestamp");
@@ -43,12 +44,30 @@ export function validateEvent(event, { checkHash = true } = {}) {
         if (!present(artifact?.[key])) errors.push(`artifact ${index} requires ${key}`);
       }
     });
+    const resolution = event.payload?.attributes?.resolution;
+    if (resolution && !["source", "crystallized"].includes(resolution)) {
+      errors.push("object.publish payload.attributes.resolution must be source or crystallized");
+    }
+    if (resolution === "crystallized") {
+      const origin = event.payload?.attributes?.crystallization;
+      if (!present(origin?.source?.objectId) || !present(origin?.source?.versionId) || !present(origin?.source?.selector)) {
+        errors.push("crystallized object requires an exact source object, version, and selector");
+      }
+      if (!Array.isArray(origin?.triggers) || origin.triggers.length === 0) {
+        errors.push("crystallized object requires at least one materialization trigger");
+      } else if (recognizedMaterializationTriggers(origin.triggers).length === 0) {
+        errors.push("crystallized object requires an independent-use materialization trigger");
+      }
+    }
   }
   if (event.type === "relation.assert") {
     for (const key of ["relationId", "relationType", "subject", "object"]) {
       if (!present(event.payload?.[key])) errors.push(`relation.assert payload.${key} is required`);
     }
     if (!present(event.payload?.basis)) errors.push("relation.assert payload.basis is required");
+    if (!Array.isArray(event.payload?.triggers) || recognizedMaterializationTriggers(event.payload.triggers).length === 0) {
+      errors.push("relation.assert requires an independent-use materialization trigger");
+    }
   }
   if (event.type === "activity.record") {
     for (const key of ["activityId", "activityType"]) {

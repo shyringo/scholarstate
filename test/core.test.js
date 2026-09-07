@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { resolve } from "node:path";
 import { canonicalize, sealEvent, verifyEventId } from "../src/core/canonical.js";
+import { assessMaterialization, focusProjection } from "../src/core/granularity.js";
 import { project } from "../src/core/project.js";
 import { readEvents, verifyStore } from "../src/core/store.js";
 import { validateEvent } from "../src/core/validate.js";
@@ -112,4 +113,66 @@ test("concurrent object versions remain visible as a conflict", () => {
   assert.equal(state.objects["claim:fork"].versionConflict, true);
   assert.deepEqual(state.objects["claim:fork"].headVersions, ["claim:fork@left", "claim:fork@right"]);
   assert.match(state.integrity.warnings[0], /2 version heads/);
+});
+
+test("machine extraction alone does not create durable identity", () => {
+  const candidate = {
+    source: { objectId: "paper:test", versionId: "paper:test@1", selector: "page=3&line=8-12" },
+    triggers: ["ai-extraction", "high-model-confidence"],
+  };
+  assert.deepEqual(assessMaterialization(candidate), {
+    eligible: false,
+    recognizedTriggers: [],
+    reason: "machine extraction alone does not justify a durable research object",
+  });
+});
+
+test("independent use can crystallize an exactly addressed fragment", () => {
+  const result = assessMaterialization({
+    source: { objectId: "paper:test", versionId: "paper:test@1", selector: "page=3&line=8-12" },
+    triggers: ["evidence-attachment", "evidence-attachment"],
+  });
+  assert.equal(result.eligible, true);
+  assert.deepEqual(result.recognizedTriggers, ["evidence-attachment"]);
+});
+
+test("machine inference alone cannot publish a durable relation", () => {
+  const event = sealEvent({
+    type: "relation.assert",
+    createdAt: "2026-09-07T01:00:00.000Z",
+    actor: { id: "urn:test:agent", kind: "ai" },
+    humanAnchors: [],
+    payload: {
+      relationId: "relation:test",
+      relationType: "test:similar-to",
+      subject: "claim:left",
+      object: "claim:right",
+      basis: "embedding similarity",
+      triggers: ["ai-extraction", "high-model-confidence"],
+    },
+  });
+  assert.ok(validateEvent(event).some((error) => error.includes("independent-use")));
+});
+
+test("focus projections remain bounded and disclose truncation", async () => {
+  const state = project(await readEvents(examplePath));
+  const focus = focusProjection(state, {
+    roots: ["claim:flashattention-io-aware-exact"],
+    depth: 2,
+    limit: 2,
+  });
+  assert.equal(Object.keys(focus.objects).length, 2);
+  assert.equal(focus.truncated, true);
+  assert.equal(focus.limit, 2);
+});
+
+test("example exposes a workload vector instead of one scale score", async () => {
+  const state = project(await readEvents(examplePath));
+  assert.deepEqual(state.workload, {
+    sourceObjects: 2,
+    crystallizedObjects: 3,
+    unspecifiedObjects: 0,
+    machineProposedClaims: 1,
+    claimsWithoutHumanAttestation: 1,
+  });
 });

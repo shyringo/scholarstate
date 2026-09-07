@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:scholarstate:protocol:0.1:event",
+  "$id": "urn:scholarstate:protocol:0.2:event",
   "title": "ScholarState event",
   "type": "object",
   "required": ["protocol", "type", "createdAt", "actor", "humanAnchors", "payload", "eventId"],
   "additionalProperties": true,
   "properties": {
-    "protocol": { "const": "scholarstate/0.1" },
+    "protocol": { "const": "scholarstate/0.2" },
     "type": {
       "enum": ["object.publish", "relation.assert", "activity.record", "attestation.issue", "profile.publish"]
     },
@@ -67,18 +67,41 @@
         "versionId": { "$ref": "#/$defs/nonEmpty" },
         "title": { "$ref": "#/$defs/nonEmpty" },
         "replaces": { "$ref": "#/$defs/nonEmpty" },
-        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/artifact" } }
+        "artifacts": { "type": "array", "items": { "$ref": "#/$defs/artifact" } },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "resolution": { "enum": ["source", "crystallized"] },
+            "crystallization": {
+              "type": "object",
+              "required": ["source", "triggers"],
+              "properties": {
+                "source": {
+                  "type": "object",
+                  "required": ["objectId", "versionId", "selector"],
+                  "properties": {
+                    "objectId": { "$ref": "#/$defs/nonEmpty" },
+                    "versionId": { "$ref": "#/$defs/nonEmpty" },
+                    "selector": { "$ref": "#/$defs/nonEmpty" }
+                  }
+                },
+                "triggers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmpty" } }
+              }
+            }
+          }
+        }
       }
     },
     "relationAssert": {
       "type": "object",
-      "required": ["relationId", "relationType", "subject", "object", "basis"],
+      "required": ["relationId", "relationType", "subject", "object", "basis", "triggers"],
       "properties": {
         "relationId": { "$ref": "#/$defs/nonEmpty" },
         "relationType": { "$ref": "#/$defs/nonEmpty" },
         "subject": { "$ref": "#/$defs/nonEmpty" },
         "object": { "$ref": "#/$defs/nonEmpty" },
-        "basis": { "$ref": "#/$defs/nonEmpty" }
+        "basis": { "$ref": "#/$defs/nonEmpty" },
+        "triggers": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/nonEmpty" } }
       }
     },
     "activityRecord": {

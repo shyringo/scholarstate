@@ -25,7 +25,7 @@ export function sha256(value) {
 
 export function sealEvent(draft) {
   const event = {
-    protocol: "scholarstate/0.1",
+    protocol: "scholarstate/0.2",
     ...draft,
   };
   delete event.eventId;

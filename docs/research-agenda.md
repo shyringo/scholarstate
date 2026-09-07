@@ -11,6 +11,8 @@ The next stage should test the protocol against reality rather than add fields s
 5. Can low-structure material enter the system cheaply and acquire structure incrementally without becoming second-class or being rejected?
 6. Can independent implementations merge records deterministically without trusting a central server?
 7. Does the cost of verification remain bounded when AI increases claim production by orders of magnitude?
+8. What fraction of machine-extracted candidates ever cross an independent-use threshold, and which triggers predict later value without suppressing neglected work?
+9. Can federated indexes disclose their coverage well enough that users do not mistake a bounded view for the whole literature?
 
 ## First Field Trial
 
@@ -21,5 +23,6 @@ Choose one active AI research question with public papers, code, benchmarks, and
 - fraction of consequential status changes with a complete responsibility chain;
 - effort needed to update the synthesis after new evidence;
 - information lost when exporting back to papers, repositories, and existing metadata standards.
+- candidate-to-crystallized ratio, human review queue growth, and active projection size over time.
 
 The field trial should drive profile design. The universal kernel changes only when the trial exposes a cross-disciplinary invariant or a failure that profiles cannot solve.

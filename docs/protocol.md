@@ -1,4 +1,4 @@
-# ScholarState Protocol 0.1
+# ScholarState Protocol 0.2
 
 ## Purpose
 
@@ -8,7 +8,7 @@ Normative terms such as MUST, SHOULD, and MAY are interpreted as described by RF
 
 ## Invariants
 
-1. A conforming event MUST be immutable after publication. Its `eventId` MUST equal the SHA-256 digest of the RFC 8785 JSON Canonicalization Scheme representation of the event without `eventId`. Protocol 0.1 accepts only ordinary JSON values and rejects non-finite numbers and non-JSON runtime values.
+1. A conforming event MUST be immutable after publication. Its `eventId` MUST equal the SHA-256 digest of the RFC 8785 JSON Canonicalization Scheme representation of the event without `eventId`. Protocol 0.2 accepts only ordinary JSON values and rejects non-finite numbers and non-JSON runtime values.
 2. An object identifier MUST remain stable across versions. A version identifier MUST identify exact content or an exact recorded observation.
 3. A new object version MUST NOT erase or mutate a previous version.
 4. An artifact reference MUST identify its media type, location, and role. A structured interpretation MUST NOT silently replace the source artifact.
@@ -17,6 +17,7 @@ Normative terms such as MUST, SHOULD, and MAY are interpreted as described by RF
 7. A decisive attestation MUST name its jurisdiction and policy version and MUST terminate in at least one human responsibility anchor.
 8. A projection MUST be reproducible from the events it consumes and MUST identify the profile or projection rules used when those rules affect meaning.
 9. A profile MUST be versioned. Reinterpreting old records with a new profile MUST NOT alter the old records.
+10. Machine extraction alone MUST NOT require the publication of a durable research object. Profiles SHOULD define an independent-use threshold for promoting source fragments.
 
 ## Envelope
 
@@ -24,7 +25,7 @@ Every event uses this common envelope:
 
 ```json
 {
-  "protocol": "scholarstate/0.1",
+  "protocol": "scholarstate/0.2",
   "type": "attestation.issue",
   "createdAt": "2026-09-07T00:11:00.000Z",
   "actor": {
@@ -46,9 +47,11 @@ Every event uses this common envelope:
 
 Publishes one immutable version of a stable research object. The kernel treats `objectType` as an extensible identifier. Profiles can define types such as a theorem, oral history, specimen, simulation, dataset, model checkpoint, instrument, or claim without changing the kernel.
 
+`attributes.resolution` may distinguish a losslessly referenced `source` from a `crystallized` fragment with an independent lifecycle. A crystallized object identifies its exact source object, version, selector, and materialization triggers. Candidate fragments produced only for search or synthesis remain outside the durable event record until they cross the threshold described in [granularity](granularity.md).
+
 ### `relation.assert`
 
-Asserts a typed relation. The event records the assertion, not eternal truth. A later event may contradict the relation without deleting it.
+Asserts a typed relation. The event records the assertion, not eternal truth. A later event may contradict the relation without deleting it. Candidate relations computed for retrieval remain disposable; a durable relation names at least one independent-use materialization trigger under the same rule as crystallized objects.
 
 ### `activity.record`
 
@@ -79,6 +82,10 @@ any state -> superseded or retracted
 ```
 
 This is useful for navigation but is not normative science. A replication may fail to address the same population, apparatus, theorem assumptions, model version, or metric. Profiles must define equivalence and evidence rules before claiming stronger semantics.
+
+## Bounded Projection
+
+A conforming interface SHOULD default to a question- or object-centered focus view rather than loading a global graph. It MUST expose configured limits and indicate truncation. The reference API caps traversal depth at 6 and result size at 2,000 objects; its user-facing default is 200 objects.
 
 ## Compatibility Direction
 

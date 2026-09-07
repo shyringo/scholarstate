@@ -1,6 +1,6 @@
 {
   "name": "scholarstate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A local-first protocol and reference implementation for auditable research state.",
   "type": "module",
   "private": true,

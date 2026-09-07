@@ -16,7 +16,7 @@ const drafts = [
     humanAnchors: [human.id],
     payload: {
       profileId: "profile:ai-research",
-      version: "0.1.0",
+      version: "0.2.0",
       title: "AI research profile",
       description: "An illustrative, forkable vocabulary for claims, methods, code, tests, and review in AI research.",
       objectTypes: ["ai:paper", "ai:claim", "ai:method", "ai:software", "ai:evidence"],
@@ -38,7 +38,8 @@ const drafts = [
       attributes: {
         authors: ["Tri Dao", "Daniel Y. Fu", "Stefano Ermon", "Atri Rudra", "Christopher Re"],
         published: "2022-05-27",
-        sourceKind: "preprint"
+        sourceKind: "preprint",
+        resolution: "source"
       },
       artifacts: [
         { mediaType: "text/html", url: "https://arxiv.org/abs/2205.14135", role: "landing-page" },
@@ -60,7 +61,12 @@ const drafts = [
       attributes: {
         scope: "The algorithm and hardware model described by arXiv:2205.14135v2",
         extractedFrom: "abstract",
-        extractionStatus: "machine-extracted; not independently verified"
+        extractionStatus: "machine-extracted; not independently verified",
+        resolution: "crystallized",
+        crystallization: {
+          source: { objectId: "arxiv:2205.14135", versionId: "arxiv:2205.14135v2", selector: "abstract" },
+          triggers: ["external-reference", "evidence-attachment"]
+        }
       },
       artifacts: []
     }
@@ -76,7 +82,14 @@ const drafts = [
       versionId: "method:flashattention-tiling@1",
       title: "Tiled attention with IO-aware memory access",
       summary: "A method record extracted from the paper, retaining its dependency on the exact source version.",
-      attributes: { source: "arxiv:2205.14135v2" },
+      attributes: {
+        source: "arxiv:2205.14135v2",
+        resolution: "crystallized",
+        crystallization: {
+          source: { objectId: "arxiv:2205.14135", versionId: "arxiv:2205.14135v2", selector: "algorithm-description" },
+          triggers: ["downstream-dependency"]
+        }
+      },
       artifacts: []
     }
   },
@@ -91,7 +104,7 @@ const drafts = [
       versionId: "github:Dao-AILab/flash-attention@main-observed-2026-09-07",
       title: "Official FlashAttention implementation",
       summary: "The authors' public implementation and test suite. The moving main branch is recorded with an observation date, not presented as an immutable commit.",
-      attributes: { provenanceCaveat: "Resolve to a commit before using this version as reproducibility evidence." },
+      attributes: { provenanceCaveat: "Resolve to a commit before using this version as reproducibility evidence.", resolution: "source" },
       artifacts: [
         { mediaType: "text/html", url: "https://github.com/Dao-AILab/flash-attention", role: "repository" },
         { mediaType: "text/plain", url: "https://github.com/Dao-AILab/flash-attention/blob/main/tests/test_flash_attn.py", role: "tests" }
@@ -112,7 +125,12 @@ const drafts = [
       attributes: {
         evidenceClass: "author-supplied-test",
         independence: "not-independent",
-        execution: "not-run-by-this-demo"
+        execution: "not-run-by-this-demo",
+        resolution: "crystallized",
+        crystallization: {
+          source: { objectId: "github:Dao-AILab/flash-attention", versionId: "github:Dao-AILab/flash-attention@main-observed-2026-09-07", selector: "README#tests" },
+          triggers: ["evidence-attachment"]
+        }
       },
       artifacts: [
         { mediaType: "text/html", url: "https://github.com/Dao-AILab/flash-attention#tests", role: "source" }
@@ -129,7 +147,8 @@ const drafts = [
       relationType: "ai:claims",
       subject: "arxiv:2205.14135",
       object: "claim:flashattention-io-aware-exact",
-      basis: "arxiv:2205.14135v2 abstract"
+      basis: "arxiv:2205.14135v2 abstract",
+      triggers: ["external-reference"]
     }
   },
   {
@@ -142,7 +161,8 @@ const drafts = [
       relationType: "ai:describes",
       subject: "arxiv:2205.14135",
       object: "method:flashattention-tiling",
-      basis: "paper content"
+      basis: "paper content",
+      triggers: ["downstream-dependency"]
     }
   },
   {
@@ -155,7 +175,8 @@ const drafts = [
       relationType: "ai:implements",
       subject: "github:Dao-AILab/flash-attention",
       object: "method:flashattention-tiling",
-      basis: "repository authors identify it as the official implementation"
+      basis: "repository authors identify it as the official implementation",
+      triggers: ["downstream-dependency"]
     }
   },
   {
@@ -168,7 +189,8 @@ const drafts = [
       relationType: "ai:supports",
       subject: "evidence:official-reference-tests",
       object: "claim:flashattention-io-aware-exact",
-      basis: "official repository test description; execution not reproduced here"
+      basis: "official repository test description; execution not reproduced here",
+      triggers: ["evidence-attachment"]
     }
   },
   {

@@ -23,9 +23,10 @@ async function refresh() {
   const warnings = state.integrity.warnings.length;
   document.querySelector("#integrity").innerHTML = `<span class="signal"></span> ${state.eventCount} events verified${warnings ? `, ${warnings} warnings` : ""}`;
   document.querySelector("#metric-events").textContent = state.eventCount;
-  document.querySelector("#metric-objects").textContent = Object.keys(state.objects).length;
-  document.querySelector("#metric-links").textContent = state.relations.length;
-  document.querySelector("#metric-decisions").textContent = state.decisions.length;
+  document.querySelector("#metric-sources").textContent = state.workload.sourceObjects;
+  document.querySelector("#metric-crystallized").textContent = state.workload.crystallizedObjects;
+  document.querySelector("#metric-review").textContent = state.workload.claimsWithoutHumanAttestation;
+  document.querySelector("#scope-note").textContent = `${Object.keys(state.objects).length} durable objects in this bounded record`;
   renderGraph();
   renderDetail();
   renderTable();
@@ -138,7 +139,8 @@ function renderDetail() {
     <h2>${escapeHtml(object.latest.title)}</h2>
     <p class="detail-summary">${escapeHtml(object.latest.summary)}</p>
     <div class="status-line"><span class="status-pill ${object.status}">${escapeHtml(object.status)}</span><span class="subtle">Projected state, not a universal verdict</span></div>
-    <dl class="detail-meta"><dt>Stable ID</dt><dd>${escapeHtml(object.id)}</dd><dt>Version</dt><dd>${escapeHtml(object.latest.id)}</dd><dt>Recorded by</dt><dd>${escapeHtml(object.latest.actor.name ?? object.latest.actor.id)} (${escapeHtml(object.latest.actor.kind)})</dd></dl>
+    <dl class="detail-meta"><dt>Stable ID</dt><dd>${escapeHtml(object.id)}</dd><dt>Version</dt><dd>${escapeHtml(object.latest.id)}</dd><dt>Resolution</dt><dd>${escapeHtml(object.latest.attributes.resolution ?? "unspecified")}</dd><dt>Recorded by</dt><dd>${escapeHtml(object.latest.actor.name ?? object.latest.actor.id)} (${escapeHtml(object.latest.actor.kind)})</dd></dl>
+    ${crystallizationHtml(object)}
     <div class="detail-section"><h3>Source artifacts</h3><ul class="detail-list">${artifacts.length ? artifacts.map((item) => `<li><a href="${safeUrl(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.role)}</a> &middot; ${escapeHtml(item.mediaType)}</li>`).join("") : "<li>No artifact attached to this object version</li>"}</ul></div>
     <div class="detail-section"><h3>Relations</h3><ul class="detail-list">${related.length ? related.map((item) => `<li><strong>${escapeHtml(item.relationType)}</strong><br>${escapeHtml(item.subject === object.id ? `to ${item.object}` : `from ${item.subject}`)}</li>`).join("") : "<li>No typed relations</li>"}</ul></div>
     <div class="detail-section"><h3>Attestations</h3><ul class="detail-list">${attestations.length ? attestations.map((item) => `<li><strong>${escapeHtml(item.attestationType)} &middot; ${escapeHtml(item.position)}</strong><br>${escapeHtml(item.statement)}<div class="subtle">${escapeHtml(item.accountability)} &middot; proof ${escapeHtml(item.proofStatus)}</div></li>`).join("") : "<li>No one has attested to this object yet</li>"}</ul></div>`;
@@ -147,7 +149,7 @@ function renderDetail() {
 function renderTable() {
   document.querySelector("#object-table").innerHTML = Object.values(state.objects).map((object) => `<tr>
     <td><button class="object-link" data-object="${escapeHtml(object.id)}">${escapeHtml(object.latest.title)}</button><div class="subtle">${escapeHtml(object.id)}</div></td>
-    <td>${escapeHtml(typeLabels[object.type] ?? object.type)}</td><td>${escapeHtml(object.latest.id)}</td>
+    <td>${escapeHtml(object.latest.attributes.resolution ?? "unspecified")}<div class="subtle">${escapeHtml(typeLabels[object.type] ?? object.type)}</div></td><td>${escapeHtml(object.latest.id)}</td>
     <td><span class="status-pill ${object.status}">${escapeHtml(object.status)}</span></td><td>${object.incoming + object.outgoing}</td>
   </tr>`).join("");
   document.querySelectorAll("[data-object]").forEach((button) => button.addEventListener("click", () => {
@@ -165,6 +167,12 @@ function renderLog() {
 function eventLabel(event) {
   const value = event.payload;
   return value.title ?? value.statement ?? value.relationId ?? value.activityId ?? value.profileId;
+}
+
+function crystallizationHtml(object) {
+  const value = object.latest.attributes.crystallization;
+  if (!value) return "";
+  return `<div class="detail-section"><h3>Why this fragment became durable</h3><ul class="detail-list"><li>${value.triggers.map(escapeHtml).join(", ")}<div class="subtle">${escapeHtml(value.source.objectId)} @ ${escapeHtml(value.source.versionId)} / ${escapeHtml(value.source.selector)}</div></li></ul></div>`;
 }
 
 function bindDialog() {

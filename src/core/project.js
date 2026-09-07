@@ -4,7 +4,7 @@ const STATUS_ORDER = ["retracted", "superseded", "contested", "replicated", "sup
 
 export function project(events) {
   const state = {
-    protocol: "scholarstate/0.1",
+    protocol: "scholarstate/0.2",
     eventCount: 0,
     objects: {},
     relations: [],
@@ -13,6 +13,13 @@ export function project(events) {
     profiles: {},
     decisions: [],
     integrity: { warnings: [] },
+    workload: {
+      sourceObjects: 0,
+      crystallizedObjects: 0,
+      unspecifiedObjects: 0,
+      machineProposedClaims: 0,
+      claimsWithoutHumanAttestation: 0,
+    },
   };
 
   const orderedEvents = [...events].sort((left, right) =>
@@ -87,6 +94,27 @@ export function project(events) {
     object.incoming = state.relations.filter((relation) => relation.object === object.id).length;
     object.outgoing = state.relations.filter((relation) => relation.subject === object.id).length;
     object.attestationCount = state.attestations.filter((item) => item.subject === object.id).length;
+    const resolution = object.latest.attributes.resolution ?? "unspecified";
+    if (resolution === "source") state.workload.sourceObjects += 1;
+    else if (resolution === "crystallized") state.workload.crystallizedObjects += 1;
+    else state.workload.unspecifiedObjects += 1;
+    if (object.type.endsWith(":claim") && object.latest.actor.kind === "ai") {
+      state.workload.machineProposedClaims += 1;
+      const humanAttestation = state.attestations.some((item) =>
+        item.subject === object.id &&
+        item.accountability === "human-anchored" &&
+        item.attestationType !== "source-report" &&
+        ["supports", "opposes", "decides"].includes(item.position));
+      if (!humanAttestation) state.workload.claimsWithoutHumanAttestation += 1;
+    }
+    const origin = object.latest.attributes.crystallization?.source;
+    if (origin) {
+      const source = state.objects[origin.objectId];
+      if (!source) state.integrity.warnings.push(`object ${object.id} crystallized from unknown source ${origin.objectId}`);
+      else if (!source.versions.some((version) => version.id === origin.versionId)) {
+        state.integrity.warnings.push(`object ${object.id} crystallized from unknown version ${origin.versionId}`);
+      }
+    }
   }
   for (const relation of state.relations) {
     if (!state.objects[relation.subject]) state.integrity.warnings.push(`relation ${relation.relationId} has unknown subject ${relation.subject}`);

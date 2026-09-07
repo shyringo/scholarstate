@@ -47,6 +47,8 @@ No plane should silently absorb the others. In particular, a convenient projecti
 8. **No irreversible institutional lock-in.** Records, profiles, and recognized decisions must be exportable; communities retain meaningful rights to fork and exit.
 9. **No costless verification burden.** Actors who introduce large volumes of claims should expose scope, uncertainty, and evidence so validation resources can be allocated deliberately.
 10. **No permanent status without maintenance.** A status is a dated projection under identified rules, not an eternal label.
+11. **No compulsory atomization.** Fine structure is created when independent scientific use justifies its identity and verification cost, not merely because a machine can extract it.
+12. **No compulsory global replication.** The right to publish does not create an obligation for every community to store, index, review, or recognize an object.
 
 ## Incentive Direction
 
@@ -55,6 +57,8 @@ Credit should attach to useful acts across the research lifecycle: forming impor
 Resource allocation should optimize expected value of information under real constraints, not engagement. Candidate signals include decision relevance, uncertainty, downstream dependency, verification cost, neglectedness, and potential harm. These signals must remain inspectable and plural; collapsing them into one ranking would invite gaming and conceal value judgments.
 
 One promising mechanism is a **verification budget**: high-throughput claim production is paired with explicit compute, experiment, reviewer, or funding commitments for checking the resulting burden. This is a research hypothesis, not yet a protocol requirement. Field trials should determine whether it improves correction rates or merely privileges wealthy actors.
+
+The counterweight is **progressive crystallization**: legacy material enters losslessly at its existing granularity; cheap candidate structure is computed on demand; only fragments that acquire independent use become durable objects. See [granularity](granularity.md).
 
 ## AI And Institutional Sovereignty
 

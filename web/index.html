@@ -29,7 +29,7 @@
         </nav>
         <div class="rail-note">
           <span class="eyebrow">Protocol</span>
-          <strong>scholarstate/0.1</strong>
+          <strong>scholarstate/0.2</strong>
           <span>Local-first &middot; append-only</span>
         </div>
       </aside>
@@ -46,9 +46,9 @@
 
         <section class="metrics" aria-label="Record summary">
           <div><span id="metric-events">0</span><small>immutable events</small></div>
-          <div><span id="metric-objects">0</span><small>research objects</small></div>
-          <div><span id="metric-links">0</span><small>typed relations</small></div>
-          <div><span id="metric-decisions">0</span><small>formal decisions</small></div>
+          <div><span id="metric-sources">0</span><small>source objects</small></div>
+          <div><span id="metric-crystallized">0</span><small>crystallized objects</small></div>
+          <div><span id="metric-review">0</span><small>claims awaiting human review</small></div>
         </section>
 
         <section class="view active" id="view-map">
@@ -68,7 +68,7 @@
             <div class="graph-panel">
               <div class="panel-heading">
                 <div><span class="eyebrow">Derived view</span><h2>Research state graph</h2></div>
-                <span class="view-note">Select an object to inspect its record</span>
+                <span class="view-note" id="scope-note">Bounded local view</span>
               </div>
               <div id="graph" class="graph" role="img" aria-label="Research objects and their typed relationships"></div>
             </div>
@@ -80,7 +80,7 @@
           <div class="section-heading"><div><span class="eyebrow">Inventory</span><h2>Research objects</h2></div></div>
           <div class="object-table-wrap">
             <table>
-              <thead><tr><th>Object</th><th>Type</th><th>Version</th><th>State</th><th>Links</th></tr></thead>
+              <thead><tr><th>Object</th><th>Resolution</th><th>Version</th><th>State</th><th>Links</th></tr></thead>
               <tbody id="object-table"></tbody>
             </table>
           </div>
