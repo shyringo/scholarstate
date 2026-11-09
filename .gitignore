@@ -1,5 +1,8 @@
 .scholarstate/
 coverage/
 *.log
+node_modules/
+.env
+.env.*
 .DS_Store
 Thumbs.db

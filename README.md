@@ -1,21 +1,25 @@
 # ScholarState
 
+ScholarState — a minimal, zero-dependency toolkit for representing and tracking the state of scholarly claims.
+
 ScholarState turns papers, code, data, reviews, and replications into a versioned research record whose current state can be inspected and rebuilt. It is a local-first protocol, reference implementation, and working web interface for moving from publishing documents to maintaining accountable knowledge.
 
 The bundled FlashAttention record contains 12 hash-verified events, 5 research objects, and 4 typed relations. Its visible status is explicitly a projection, not a platform-issued truth score or formal academic decision.
 
 ## Quick Start
 
-Requires Node.js 22 or newer. No package installation is needed.
+Requires Node.js 22 or newer. No package installation, no dependencies, no build step.
 
 ```powershell
+git clone https://github.com/shyringo/scholarstate.git
+cd scholarstate
 npm run demo
 npm run serve
 ```
 
 Open <http://127.0.0.1:4317>. Select the main claim to inspect its exact source version, evidence class, machine extraction history, and attestations. Use **Record attestation** to append a human-accountable review, replication report, contradiction, or jurisdiction-scoped decision to your local record.
 
-Run these commands from the repository root. When a public repository exists, the clone command will be added here.
+Run these commands from the repository root.
 
 ## What Is Different
 
