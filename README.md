@@ -4,6 +4,8 @@ ScholarState — a minimal, zero-dependency toolkit for representing and trackin
 
 ScholarState turns papers, code, data, reviews, and replications into a versioned research record whose current state can be inspected and rebuilt. It is a local-first protocol, reference implementation, and working web interface for moving from publishing documents to maintaining accountable knowledge.
 
+**Status:** an early placeholder release — the protocol sketch and a runnable reference implementation. The wider research programme around it (papers, field trials, extended methodology) is not part of this repository yet.
+
 The bundled FlashAttention record contains 12 hash-verified events, 5 research objects, and 4 typed relations. Its visible status is explicitly a projection, not a platform-issued truth score or formal academic decision.
 
 ## Quick Start
